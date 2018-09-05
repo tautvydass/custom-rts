@@ -34,3 +34,30 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+# Custom
+
+*.asset
+*.asset.meta
+*.meta
+*.mat
+*.mat.meta
+*.fbx
+*.fbx.meta
+*.prefab
+*.prefab.meta
+*.unity
+*.unity.meta
+*.cs.meta
+*.shader
+*.shader.meta
+*.png
+*.png.meta
+*.jpg
+*.jpg.meta
+
+.vscode/
+Debug/
+Library/
+obj/
+ProjectSettings/
