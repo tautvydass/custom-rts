@@ -34,6 +34,8 @@ public class MapController : MonoBehaviour
     private bool generateOnAwake = false;
 
     [SerializeField]
+    private TreeFactory treeFactory;
+    [SerializeField]
     [Range(0, 1)]
     private float forrestDensity;
     [SerializeField]
@@ -47,9 +49,12 @@ public class MapController : MonoBehaviour
 
     private List<GameObject> trees;
 
+    [SerializeField]
+    private bool bakeNavmeshOnGeneration;
+
     private void Awake()
     {
-        if(generateOnAwake)
+        if (generateOnAwake)
         {
             GenerateMap();
         }
@@ -57,11 +62,18 @@ public class MapController : MonoBehaviour
 
     public void GenerateMap()
     {
+        treeFactory.SetupInstantiateCall(Instantiate);
+
         GenerateMapMesh();
         GenerateMapRegions();
         GenerateForrests();
+
         //ApplyAndApplyMapTexture();
-        CreateNavMesh();
+
+        if(bakeNavmeshOnGeneration)
+        {
+            CreateNavMesh();
+        }
 
         textureData.ApplyToMaterial(meshRenderer.sharedMaterial);
     }
@@ -98,6 +110,18 @@ public class MapController : MonoBehaviour
         mapData.RegionMap = RegionGenerator.GenerateRegionMap(noiseMap, mapData.HeightMap, forrestry, forrestHeightBounds);
     }
 
+    public void DestroyTrees()
+    {
+        if (trees != null)
+        {
+            foreach (var tree in trees)
+            {
+                DestroyImmediate(tree);
+            }
+            trees.Clear();
+        }
+    }
+
     private void GenerateForrests()
     {
         if(mapData.RegionMap == null)
@@ -105,14 +129,7 @@ public class MapController : MonoBehaviour
             return;
         }
 
-        if(trees != null)
-        {
-            foreach(var tree in trees)
-            {
-                DestroyImmediate(tree);
-            }
-            trees.Clear();
-        }
+        DestroyTrees();
 
         trees = new List<GameObject>();
 
@@ -127,7 +144,9 @@ public class MapController : MonoBehaviour
                 {
                     if(Random.Range(0f, 1f) < forrestDensity)
                     {
-                        var tree = Instantiate(treePrefab, new Vector3((x - halfWidth + 1) * transform.localScale.x, mapData.HeightMap[x, y] * heightMapSettings.heightMultiplier, (halfHeight - y - 1) * transform.localScale.z), Quaternion.identity, treeParent);
+                        var tree = treeFactory.CreateTree();
+                        tree.transform.position = new Vector3((x - halfWidth + 1) * transform.localScale.x, mapData.HeightMap[x, y] * heightMapSettings.heightMultiplier / 2f, (halfHeight - y - 1) * transform.localScale.z);
+                        tree.transform.parent = treeParent;
                         tree.transform.localEulerAngles += new Vector3(0, Random.Range(0, 360), 0);
                         trees.Add(tree);
                     }

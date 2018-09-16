@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
-public abstract class Unit : MonoBehaviour, ISelectable
+public abstract class Unit : MonoBehaviour, ISelectable, ILighter
 {
 	[SerializeField]
 	protected UnitProperties properties;
@@ -14,6 +14,8 @@ public abstract class Unit : MonoBehaviour, ISelectable
 	public int CurrentHealth { get; private set; }
 
     public Vector3 Position => transform.position;
+
+    public float Radius => properties.viewRadius;
 
     protected SelectionInfo selectionInfo;
 

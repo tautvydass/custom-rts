@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour, IPopulationManager, IResourcesManager,
 	[SerializeField]
 	private PlayerController playerController;
 
+    private IFogOfWarManager fogOfWarManager;
+
 	private Population population;
 	private Resources resources;
 
@@ -73,6 +75,11 @@ public class GameManager : MonoBehaviour, IPopulationManager, IResourcesManager,
 
         OnResourcesUpdated?.Invoke(resources);
         OnPopulationUpdated?.Invoke(population);
+
+        fogOfWarManager = Camera.main.GetComponent<IFogOfWarManager>();
+
+        fogOfWarManager.AddLightObjects(structures.Select(structure => structure as ILighter));
+        fogOfWarManager.AddLightObjects(units.Select(unit => unit as ILighter));
     }
 
     public int GetAvailablePopulation()
@@ -154,6 +161,7 @@ public class GameManager : MonoBehaviour, IPopulationManager, IResourcesManager,
     private void OnUnitRecruited(Unit unit)
     {
         units.Add(unit);
+        fogOfWarManager.AddLightObject(unit as ILighter);
         if(unit is Worker)
         {
             (unit as Worker).SetResourceDepotManager(this);

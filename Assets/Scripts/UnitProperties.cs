@@ -12,4 +12,5 @@ public class UnitProperties : ScriptableObject
 	public int population;
     public float stoppingDistance;
     public float radius;
+    public float viewRadius;
 }

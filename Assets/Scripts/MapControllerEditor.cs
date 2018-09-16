@@ -17,5 +17,9 @@ public class MapControllerEditor : Editor
         {
             (target as MapController).CreateNavMesh();
         }
+        if (GUILayout.Button("Destroy Trees"))
+        {
+            (target as MapController).DestroyTrees();
+        }
     }
 }

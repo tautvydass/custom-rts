@@ -1,0 +1,83 @@
+﻿#pragma kernel CalculateFOW
+#pragma kernel DrawFOW
+
+struct Object
+{
+    half2 position;
+    half radius;
+};
+
+RWStructuredBuffer<half> textureInfo;
+RWStructuredBuffer<Object> objects;
+
+uint objectsCount;
+uint screenWidth;
+float blendStrength;
+float fowStrength;
+
+Texture2D<half4> input;
+RWTexture2D<half4> output;
+
+float distance(half2 lhs, half2 rhs)
+{
+    float x = lhs.x - rhs.x;
+    float y = (lhs.y - rhs.y) * 1.25;
+    return sqrt(x * x + y * y);
+}
+
+[numthreads(8, 8, 1)]
+void CalculateFOW(uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x + screenWidth * id.y;
+    if (textureInfo[index] >= 1)
+    {
+        return;
+    }
+    for (uint i = 0; i < objectsCount; i++)
+    {
+        float dist = distance(objects[i].position, half2(id.xy));
+        if (dist < objects[i].radius)
+        {
+            if (dist / objects[i].radius < blendStrength)
+            {
+                textureInfo[id.x + screenWidth * id.y] += 1;
+                return;
+            }
+            else
+            {
+                float blendDistance = objects[i].radius * blendStrength;
+                textureInfo[index] += 1 - (dist - blendStrength * objects[i].radius) / (objects[i].radius * (1 - blendStrength));
+                if (textureInfo[index] >= 1)
+                {
+                    return;
+                }
+            }
+        }
+    }
+}
+
+half clamp(half value)
+{
+    if(value > 1)
+    {
+        return 1;
+    }
+    return value;
+}
+
+half evaluate(half value)
+{
+    return value * value;
+}
+
+[numthreads(8, 8, 1)]
+void DrawFOW(uint3 id : SV_DispatchThreadID)
+{
+    half value = textureInfo[id.x + screenWidth * id.y];
+    if(value < 1)
+    {
+        output[id.xy] = ((1 - fowStrength) + (fowStrength * evaluate(value))) * input[id.xy];
+        return;
+    }
+    output[id.xy] = input[id.xy];
+}

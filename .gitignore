@@ -49,12 +49,14 @@ sysinfo.txt
 *.unity
 *.unity.meta
 *.cs.meta
-*.shader
+*.compute.meta
 *.shader.meta
 *.png
 *.png.meta
 *.jpg
 *.jpg.meta
+*.dae
+*.txt
 
 .vscode/
 Debug/

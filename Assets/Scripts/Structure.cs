@@ -9,7 +9,7 @@ public enum StructureType
 	House = 1
 }
 
-public abstract class Structure : MonoBehaviour, ISelectable
+public abstract class Structure : MonoBehaviour, ISelectable, ILighter
 {
 	[SerializeField]
 	protected StructureProperties properties;
@@ -29,6 +29,8 @@ public abstract class Structure : MonoBehaviour, ISelectable
 	public bool Working { get; protected set; } = false;
 
     public Vector3 Position => transform.position;
+
+    public float Radius => properties.viewRadius;
 
     public bool pendingCancel = false;
 

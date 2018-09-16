@@ -7,4 +7,5 @@ public class StructureProperties : ScriptableObject
 	public int hitpoints;
 	public Sprite icon;
     public int housing;
+    public float viewRadius;
 }
